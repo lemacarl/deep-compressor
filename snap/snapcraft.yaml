@@ -1,0 +1,70 @@
+name: deep-compressor
+summary: Compress an image using an encoder model
+description: Compress an image using an encoder model
+version: 0.0.1
+
+confinement: strict
+grade: devel
+license: Apache-2.0
+
+base: core24
+
+platforms:
+  amd64:
+  arm64:
+
+package-repositories:
+  - type: apt
+    ppa: deadsnakes/ppa
+
+parts:
+  python38:
+    plugin: nil
+    stage-packages:
+      - python3.8-full
+      - python3.8-distutils
+      - python3.8-venv
+      - python3-pip
+
+  python-dependencies:
+    after: [python38]
+    plugin: python
+    build-environment:
+      - PARTS_PYTHON_INTERPRETER: python3.8
+    python-packages:
+      - numpy<2
+      - pillow
+      - tflite-runtime
+    source: .
+
+  scripts:
+    plugin: dump
+    source: .
+    override-build: |
+      cp deep_compression_script.py $CRAFT_PART_INSTALL/
+
+  model:
+    plugin: dump
+    source: .
+    override-build: |
+      cp encoder_model.tflite $CRAFT_PART_INSTALL/
+
+  test-data:
+    plugin: dump
+    source: .
+    override-build: |
+      chmod a=r me.jpg
+      cp me.jpg $CRAFT_PART_INSTALL/
+
+apps:
+  deep-compressor:
+    environment:
+      DATA_DIR: $SNAP
+    plugs:
+      - home
+    command: bin/python3 $SNAP/deep_compression_script.py
+
+  python:
+    plugs:
+      - home
+    command: bin/python3
