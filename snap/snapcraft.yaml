@@ -1,9 +1,9 @@
 name: deep-compressor
 summary: Compress an image using an encoder model
 description: Compress an image using an encoder model
-version: 0.0.1
+version: 0.0.2
 
-confinement: strict
+confinement: devmode
 grade: devel
 license: Apache-2.0
 
